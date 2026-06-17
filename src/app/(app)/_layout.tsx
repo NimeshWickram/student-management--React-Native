@@ -1,15 +1,25 @@
-import { Tabs } from 'expo-router';
-import React from 'react';
-
-// Simulated Auth Hook
-function useAuth() {
-  // In a real application, you would pull this from a global state/context
-  // 'admin', 'teacher', or 'student'
-  return { role: 'admin' }; 
-}
+import { Tabs, Redirect } from 'expo-router';
+import React, { useContext } from 'react';
+import { ActivityIndicator, View } from 'react-native';
+import { AuthContext } from '../../context/AuthContext';
 
 export default function AppLayout() {
-  const { role } = useAuth();
+  const { user, isLoading } = useContext(AuthContext);
+
+  if (isLoading) {
+    return (
+      <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
+        <ActivityIndicator size="large" />
+      </View>
+    );
+  }
+
+  // Redirect to login if not authenticated
+  if (!user) {
+    return <Redirect href="/(auth)/login" />;
+  }
+
+  const role = user.role;
 
   return (
     <Tabs screenOptions={{ headerShown: false }}>
